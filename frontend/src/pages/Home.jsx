@@ -149,14 +149,14 @@ const Home = () => {
     return (
         <>
             {showWakeNotice && (
-                <div className="fixed top-4 left-1/2 transform -translate-x-1/2 bg-yellow-50 border border-yellow-300 text-yellow-800 px-4 py-3 rounded-lg shadow-md transition-all duration-500 z-50">
+                <div className="fixed top-4 left-1/2 transform -translate-x-1/2 bg-blue-50 border border-black text-blue-800 px-4 py-3 rounded-lg shadow-md transition-all duration-500 z-50">
                     <div className="flex items-center justify-between space-x-4">
                         <span className="text-sm font-medium">
                             This app runs on a free backend (Render). If it’s not working, wait 1–3 mins for it to wake up.
                         </span>
                         <button
                             onClick={() => setShowWakeNotice(false)}
-                            className="text-yellow-600 hover:text-yellow-900 transition-colors"
+                            className="text-black hover:text-red-600 transition-colors"
                         >
                             ×
                         </button>

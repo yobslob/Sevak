@@ -81,7 +81,7 @@ const Home = () => {
     const classifyConversation = async (conversation) => {
         try {
             console.log('[CLASSIFYING]', conversation);
-            const response = await fetch('http://127.0.0.1:5000/classify', {
+            const response = await fetch('https://sevak-ugba.onrender.com/classify', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'

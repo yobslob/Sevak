@@ -28,9 +28,9 @@ HF_API_URL = "https://api-inference.huggingface.co/models/mistralai/Mixtral-8x7B
 HF_API_KEY =  os.getenv("HF_TOKEN")
 hf_headers = {"Authorization": f"Bearer {HF_API_KEY}"}
 
-@app.route('/')
-def index():
-    return render_template('index.html')
+# @app.route('/')
+# def index():
+#     return render_template('index.html')
 
 @app.route('/classify', methods=['POST'])
 def classify():

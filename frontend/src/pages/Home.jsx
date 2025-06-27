@@ -14,11 +14,7 @@ const Home = () => {
 
     const isReceiverTurn = useRef(true)
     const [showWakeNotice, setShowWakeNotice] = useState(true)
-
-    useEffect(() => {
-        const timer = setTimeout(() => setShowWakeNotice(false), 10000) // auto-dismiss after 10s
-        return () => clearTimeout(timer)
-    }, [])
+    const [fadeIn, setFadeIn] = useState(false)
 
 
 
@@ -85,6 +81,24 @@ const Home = () => {
         }
     }, [fullConversation])
 
+    useEffect(() => {
+        const showTimer = setTimeout(() => {
+            setShowWakeNotice(true)
+            setFadeIn(true)
+        }, 4000) // 4s delay
+
+        const hideTimer = setTimeout(() => {
+            setFadeIn(false)
+            setTimeout(() => setShowWakeNotice(false), 500) // wait for fade-out to finish
+        }, 14000) // 4s delay + 10s show
+
+        return () => {
+            clearTimeout(showTimer)
+            clearTimeout(hideTimer)
+        }
+    }, [])
+
+
     const classifyConversation = async (conversation) => {
         try {
             console.log('[CLASSIFYING]', conversation);
@@ -149,13 +163,16 @@ const Home = () => {
     return (
         <>
             {showWakeNotice && (
-                <div className="fixed top-4 left-1/2 transform -translate-x-1/2 bg-blue-50 border border-black text-blue-800 px-4 py-3 rounded-lg shadow-md transition-all duration-500 z-50">
+                <div className={`fixed top-4 left-1/2 transform -translate-x-1/2 bg-blue-50 border border-black text-blue-800 px-4 py-3 rounded-lg shadow-md transition-all duration-500 z-50 ${fadeIn ? 'opacity-100' : 'opacity-0'}`}>
                     <div className="flex items-center justify-between space-x-4">
                         <span className="text-sm font-medium">
                             This app runs on a free backend (Render). If it’s not working, wait 1–3 mins for it to wake up.
                         </span>
                         <button
-                            onClick={() => setShowWakeNotice(false)}
+                            onClick={() => {
+                                setFadeIn(false)
+                                setTimeout(() => setShowWakeNotice(false), 500)
+                            }}
                             className="text-black hover:text-red-600 transition-colors"
                         >
                             ×

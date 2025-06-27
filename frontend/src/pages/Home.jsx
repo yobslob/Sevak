@@ -182,7 +182,7 @@ const Home = () => {
             )}
 
             <div className="min-h-screen flex items-center justify-center p-8">
-                <div className="flex items-center gap-12">
+                <div className="flex items-center lg:gap-12 gap-6">
                     {/* Scam Score Bar - Left Side */}
                     <ScamScore
                         scamProbability={scamProbability}
@@ -192,7 +192,7 @@ const Home = () => {
                     {/* Phone Container - Center */}
                     <div className="relative">
                         {/* Phone Frame */}
-                        <div className="w-80 h-[600px] bg-black rounded-[1rem] p-1 shadow-2xl relative border-4 border-black">
+                        <div className="lg:w-80 lg:h-[600px] w-50 h-[400px] bg-black rounded-[1rem] p-1 shadow-2xl relative border-4 border-black">
                             {/* Screen */}
                             <div className="w-full h-full bg-white rounded-[1rem] flex flex-col overflow-hidden px-4 py-3 space-y-2">
                                 {/* Status Bar */}

@@ -30,6 +30,41 @@ code {
     }
   }
 
+  @keyframes fadeIn {
+  0% {
+    opacity: 0;
+    transform: translateY(10px); /* Optional: subtle upward motion */
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}  
+
+@keyframes gradientMove {
+  0% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0% 50%;
+  }
+}
+
+.dynamic-background {
+  background: linear-gradient(5deg, rgb(204, 212, 212), rgb(156, 177, 175), rgb(134, 167, 178), rgb(148, 173, 176), rgb(200, 211, 210));
+  background-size: 400% 400%;
+  animation: gradientMove 6s ease-in-out infinite;
+}
+
+.fade-in-container {
+  animation: fadeIn 1.5s ease-out forwards;
+  opacity: 0; /* Initial state */
+}
+
+
   .animate-float {
     animation: float 3s ease-in-out infinite;
   }

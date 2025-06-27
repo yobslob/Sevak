@@ -166,7 +166,7 @@ const Home = () => {
                 <div className={`fixed top-4 left-1/2 transform -translate-x-1/2 bg-blue-50 border border-black text-blue-800 px-4 py-3 rounded-lg shadow-md transition-all duration-500 z-50 ${fadeIn ? 'opacity-100' : 'opacity-0'}`}>
                     <div className="flex items-center justify-between space-x-4">
                         <span className="text-sm font-medium">
-                            This app runs on a free backend (Render). If it’s not working, wait 1–3 mins for it to wake up.
+                            &nbsp; This app runs on a free backend (Render). If it’s not working, wait 1–3 mins for it to wake up. &nbsp;
                         </span>
                         <button
                             onClick={() => {
@@ -175,7 +175,7 @@ const Home = () => {
                             }}
                             className="text-black hover:text-red-600 transition-colors"
                         >
-                            ×
+                            × &nbsp;
                         </button>
                     </div>
                 </div>

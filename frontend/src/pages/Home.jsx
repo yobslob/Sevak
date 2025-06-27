@@ -13,6 +13,13 @@ const Home = () => {
     const [suggestedReply, setSuggestedReply] = useState('')
 
     const isReceiverTurn = useRef(true)
+    const [showWakeNotice, setShowWakeNotice] = useState(true)
+
+    useEffect(() => {
+        const timer = setTimeout(() => setShowWakeNotice(false), 10000) // auto-dismiss after 10s
+        return () => clearTimeout(timer)
+    }, [])
+
 
 
     const recognitionRef = useRef(null)
@@ -140,58 +147,75 @@ const Home = () => {
     }
 
     return (
-        <div className="min-h-screen flex items-center justify-center p-8">
-            <div className="flex items-center gap-12">
-                {/* Scam Score Bar - Left Side */}
-                <ScamScore
-                    scamProbability={scamProbability}
-                    nonScamProbability={nonScamProbability}
-                />
+        <>
+            {showWakeNotice && (
+                <div className="fixed top-4 left-1/2 transform -translate-x-1/2 bg-yellow-50 border border-yellow-300 text-yellow-800 px-4 py-3 rounded-lg shadow-md transition-all duration-500 z-50">
+                    <div className="flex items-center justify-between space-x-4">
+                        <span className="text-sm font-medium">
+                            This app runs on a free backend (Render). If it’s not working, wait 1–3 mins for it to wake up.
+                        </span>
+                        <button
+                            onClick={() => setShowWakeNotice(false)}
+                            className="text-yellow-600 hover:text-yellow-900 transition-colors"
+                        >
+                            ×
+                        </button>
+                    </div>
+                </div>
+            )}
 
-                {/* Phone Container - Center */}
-                <div className="relative">
-                    {/* Phone Frame */}
-                    <div className="w-80 h-[600px] bg-black rounded-[1rem] p-1 shadow-2xl relative border-4 border-black">
-                        {/* Screen */}
-                        <div className="w-full h-full bg-white rounded-[1rem] flex flex-col overflow-hidden px-4 py-3 space-y-2">
-                            {/* Status Bar */}
-                            <div className="h-8 w-[97%] bg-gray-50 flex items-center justify-between px-6 text-xs text-gray-600">
-                                <span>&nbsp; 9:41</span>
-                                <div className="flex gap-1">
-                                    <div className="w-4 h-2 bg-green-500 rounded-sm"></div>
-                                    <div className="w-4 h-2 bg-gray-300 rounded-sm"></div>
-                                    <div className="w-4 h-2 bg-gray-300 rounded-sm"></div>
+            <div className="min-h-screen flex items-center justify-center p-8">
+                <div className="flex items-center gap-12">
+                    {/* Scam Score Bar - Left Side */}
+                    <ScamScore
+                        scamProbability={scamProbability}
+                        nonScamProbability={nonScamProbability}
+                    />
+
+                    {/* Phone Container - Center */}
+                    <div className="relative">
+                        {/* Phone Frame */}
+                        <div className="w-80 h-[600px] bg-black rounded-[1rem] p-1 shadow-2xl relative border-4 border-black">
+                            {/* Screen */}
+                            <div className="w-full h-full bg-white rounded-[1rem] flex flex-col overflow-hidden px-4 py-3 space-y-2">
+                                {/* Status Bar */}
+                                <div className="h-8 w-[97%] bg-gray-50 flex items-center justify-between px-6 text-xs text-gray-600">
+                                    <span>&nbsp; 9:41</span>
+                                    <div className="flex gap-1">
+                                        <div className="w-4 h-2 bg-green-500 rounded-sm"></div>
+                                        <div className="w-4 h-2 bg-gray-300 rounded-sm"></div>
+                                        <div className="w-4 h-2 bg-gray-300 rounded-sm"></div>
+                                    </div>
                                 </div>
-                            </div>
 
-                            {/* Transcript Area - 80% */}
-                            <div className="flex-1 overflow-hidden">
-                                <div className="h-full overflow-y-auto">
-                                    <LiveTranscript
-                                        conversation={fullConversation}
+                                {/* Transcript Area - 80% */}
+                                <div className="flex-1 overflow-hidden">
+                                    <div className="h-full overflow-y-auto">
+                                        <LiveTranscript
+                                            conversation={fullConversation}
+                                            isListening={isListening}
+                                        />
+                                    </div>
+                                </div>
+
+                                {/* Call Button Area - 20% */}
+                                <div className="h-24 flex items-center justify-center bg-gray-100 shrink-0">
+                                    <MicToggleButton
                                         isListening={isListening}
+                                        onToggle={toggleListening}
                                     />
                                 </div>
                             </div>
-
-                            {/* Call Button Area - 20% */}
-                            <div className="h-24 flex items-center justify-center bg-gray-100 shrink-0">
-                                <MicToggleButton
-                                    isListening={isListening}
-                                    onToggle={toggleListening}
-                                />
-                            </div>
                         </div>
-                    </div>
 
-                    {/* Suggested Reply Bubble - Floating from phone */}
-                    {suggestedReply && (
-                        <SuggestedReply reply={suggestedReply} />
-                    )}
+                        {/* Suggested Reply Bubble - Floating from phone */}
+                        {suggestedReply && (
+                            <SuggestedReply reply={suggestedReply} />
+                        )}
+                    </div>
                 </div>
             </div>
-        </div>
-    )
+        </>)
 }
 
 export default Home

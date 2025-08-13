@@ -22,64 +22,80 @@ const Home = () => {
     const recognitionReadyRef = useRef(false)
 
     useEffect(() => {
-        // Initialize speech recognition
-        if (typeof window !== 'undefined' && (window.SpeechRecognition || window.webkitSpeechRecognition)) {
-            const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition
-            recognitionRef.current = new SpeechRecognition()
+        if (typeof window === 'undefined') return;
 
-            recognitionRef.current.continuous = true
-            recognitionRef.current.interimResults = false
+        const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+        if (!SpeechRecognition) {
+            console.warn('SpeechRecognition not supported in this browser.');
+            return;
+        }
 
-            recognitionRef.current.onstart = () => {
-                console.log('Speech recognition started.')
-                setIsListening(true)
-            }
+        const recog = new SpeechRecognition();
+        recognitionRef.current = recog;
 
-            recognitionRef.current.onerror = (event) => {
-                console.error('Speech recognition error:', event.error)
-                setIsListening(false)
-            }
+        recog.continuous = true;
+        recog.interimResults = false;
 
-            recognitionRef.current.onend = () => {
-                console.log('Speech recognition stopped.')
-                setIsListening(false)
-            }
+        recog.onstart = () => {
+            console.log('Speech recognition started.');
+            setIsListening(true);
+        };
 
-            recognitionRef.current.onresult = async (event) => {
-                for (let i = event.resultIndex; i < event.results.length; ++i) {
-                    if (event.results[i].isFinal) {
-                        const text = event.results[i][0].transcript.trim()
-                        console.log("STT output :", text)
-                        const label = isReceiverTurn.current ? 'Receiver' : 'Caller'
-                        const labeledLine = `${label}: ${text}`
+        recog.onerror = (event) => {
+            console.error('Speech recognition error:', event.error);
+            setIsListening(false);
+        };
 
-                        console.log('[🧾 LABELED LINE]', labeledLine);
+        recog.onend = () => {
+            console.log('Speech recognition ended.');
+            setIsListening(false);
+        };
 
+        recog.onresult = (event) => {
+            for (let i = event.resultIndex; i < event.results.length; ++i) {
+                if (event.results[i].isFinal) {
+                    const text = event.results[i][0].transcript.trim();
+                    const label = isReceiverTurn.current ? 'Receiver' : 'Caller';
+                    const labeledLine = `${label}: ${text}`;
 
-                        setFullConversation(prev => {
-                            const updated = prev + labeledLine + '\n'
+                    setFullConversation(prev => {
+                        const updated = prev + labeledLine + '\n';
+                        const turnCount = updated.trim().split('\n').filter(Boolean).length;
+                        if (turnCount % 2 === 0 && turnCount !== 0) {
+                            setIsClassifying(true);
+                            classifyConversation(updated);
+                        }
+                        return updated;
+                    });
 
-                            const turnCount = updated.trim().split('\n').length
-                            if (turnCount % 2 == 0 && turnCount != 0) {
-                                classifyConversation(updated) // already has correct labels
-                            }
-                            return updated
-                        })
-
-                        isReceiverTurn.current = !isReceiverTurn.current
-
-                    }
+                    isReceiverTurn.current = !isReceiverTurn.current;
                 }
             }
+        };
 
+        // mark ready after a short delay (if you want)
+        setTimeout(() => {
+            recognitionReadyRef.current = true;
+            console.log('Speech recognition engine ready.');
+        }, 1000);
 
-            // Wait before allowing recognition
-            setTimeout(() => {
-                recognitionReadyRef.current = true
-                console.log('Speech recognition engine ready.')
-            }, 1000)
-        }
-    }, [fullConversation])
+        return () => {
+            // cleanup on unmount
+            try {
+                recog.onresult = null;
+                recog.onstart = null;
+                recog.onend = null;
+                recog.onerror = null;
+                if (recognitionRef.current) {
+                    try { recognitionRef.current.stop(); } catch (e) { /* ignore */ }
+                }
+                recognitionRef.current = null;
+            } catch (e) {
+                console.warn('Cleanup error', e);
+            }
+        };
+    }, []); // <- only once
+
 
     useEffect(() => {
         const showTimer = setTimeout(() => {
@@ -132,33 +148,33 @@ const Home = () => {
 
     const toggleListening = () => {
         if (!recognitionReadyRef.current) {
-            console.warn('Speech recognition engine not ready yet. Please wait a moment.')
-            return
+            console.warn('Speech recognition engine not ready yet. Please wait a moment.');
+            return;
         }
 
         if (!isListening) {
             try {
-                recognitionRef.current.start()
+                recognitionRef.current.start();
             } catch (err) {
-                console.error('Recognition start failed:', err)
+                console.error('Recognition start failed:', err);
             }
         } else {
-            recognitionRef.current.onend = () => {
-                console.log('Speech recognition stopped.')
-                recognitionRef.current.stop()
-                setIsListening(false)
-
-                // Safe cleanup now
-                setFullConversation('')
-                setScamProbability(0)
-                setNonScamProbability(0)
-                setSuggestedReply('')
-                isReceiverTurn.current = true
-
+            // stop the recognizer — let its onend handler update isListening
+            try {
+                recognitionRef.current.stop();
+            } catch (err) {
+                console.warn('Error stopping recognition:', err);
+                // fallback: force cleanup
+                setIsListening(false);
             }
-
+            // Optional immediate cleanup:
+            setFullConversation('');
+            setScamProbability(0);
+            setNonScamProbability(0);
+            setSuggestedReply('');
+            isReceiverTurn.current = true;
         }
-    }
+    };
 
     return (
         <>
